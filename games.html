@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lisa og Spøkelsets Fangenskap</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: #fff; padding: 20px; text-align: center; }
+    #output { margin-bottom: 20px; white-space: pre-line; font-size: 18px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 10px; cursor: pointer; }
+    img { margin-top: 2px; width: 1000px; height: auto; border: 2px solid #fff; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Lisa og Spøkelsets Fangenskap</h1>
+  <div id="output"></div>
+  <img id="sceneImage" src="" alt="Scene bilde" class="hidden">
+  <div id="choices"></div>
+  <script>
+    const output = document.getElementById("output");
+    const sceneImage = document.getElementById("sceneImage");
+    const choices = document.getElementById("choices");
+    const gameState = {
+      scene: "start"
+    };
+    const scenes = {
+      start: {
+        description: "Lisa bestemte seg for å dra ut på eventyr i skogen klokken 3 om natten. Mørket omslutter henne, og vinden hvisker mellom trærne. Hun ser en skikkelse som nærmer seg... Vil hun fortsette?",
+        image: "home.jpg",
+        options: {
+          ja: "approachGhost",
+          nei: "goHome"
+        }
+      },
+      approachGhost: {
+        description: "Lisa bestemmer seg for å nærme seg skikkelsen. Det viser seg å være et spøkelse som svever mot henne! Hun mister bevisstheten. Vil du at hun skal prøve å rømme?",
+        image: "ghost.jpg",
+        options: {
+          ja: "tryEscape",
+          nei: "wakeUp"
+        }
+      },
+      goHome: {
+        description: "Lisa bestemmer seg for å dra hjem igjen. Hun unngår faren for denne gang. Slutt.",
+        image: "home.jpg",
+        gameOver: true
+      },
+      tryEscape: {
+        description: "Lisa prøver å rømme, men spøkelset er for raskt og fanger henne igjen. Hun mister bevisstheten...",
+        image: "nnn.jpg",
+        nextScene: "wakeUp"
+      },
+      wakeUp: {
+        description: "Lisa våkner i et ukjent, mørkt rom. Spøkelset sier: 'Du er fanget her, men jeg gir deg en sjanse. Svar riktig på spørsmålene mine for å slippe fri.' Vil du svare?",
+        image: "dark_room.jpg",
+        options: {
+          ja: "question1",
+          nei: "death"
+        }
+      },
+      question1: {
+        description: "Spørsmål 1: Hva er navnet på planeten dere mennesker bor på?",
+        image: "earth.jpg",
+        options: {
+          ABDUL: "question2",
+          jorden: "death"
+        }
+      },
+      question2: {
+        description: "Riktig! Spørsmål 2: Hvilket tall er større: 8 eller 5?",
+        image: "sasa.jpg",
+        options: {
+          8: "question3",
+          5: "death"
+        }
+      },
+      question3: {
+        description: "Riktig! Spørsmål 3: Hva er klokken når solen står rett over himmelen?",
+        image: "sun.jpg",
+        options: {
+          12: "freedom",
+          8: "death" // Added a valid key here
+        }
+      },
+      death: {
+        description: "Lisa svarer feil, og spøkelset ler hånlig. 'Din sjel tilhører meg nå!' Lisa forsvinner i mørket...",
+        image: "death.jpg",
+        gameOver: true
+      },
+      freedom: {
+        description: "Lisa svarer riktig på alle spørsmålene. 'Du har bestått testen,' sier spøkelset. 'Du er fri til å gå, men husk: denne skogen skjuler flere hemmeligheter enn du aner.' Lisa forlater skogen i live.",
+        image: "freedom.jpg",
+        gameOver: true
+      }
+    };
+    function renderScene() {
+      const scene = scenes[gameState.scene];
+      output.textContent = scene.description;
+      if (scene.image) {
+        sceneImage.src = "blde/"+scene.image;
+        sceneImage.classList.remove("hidden");
+      } else {
+        sceneImage.classList.add("hidden");
+      }
+      choices.innerHTML = "";
+      if (scene.options) {
+        for (const [key, value] of Object.entries(scene.options)) {
+          const button = document.createElement("button");
+          button.textContent = key;
+          button.onclick = () => {
+            gameState.scene = value;
+            renderScene();
+          };
+          choices.appendChild(button);
+        }
+      }
+      if (scene.gameOver) {
+        const restartButton = document.createElement("button");
+        restartButton.textContent = "Start på nytt";
+        restartButton.onclick = () => {
+          gameState.scene = "start";
+          renderScene();
+        };
+        choices.appendChild(restartButton);
+      }
+    }
+    renderScene();
+  </script>
+</body>
+</html>
